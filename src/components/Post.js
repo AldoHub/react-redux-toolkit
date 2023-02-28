@@ -5,9 +5,11 @@ import { useParams } from 'react-router-dom';
 //state
 import { useDispatch, useSelector } from 'react-redux';
 
-import { getPost } from '../features/posts/postSlice';
+import { getPost, updatePost, deletePost } from '../features/posts/postSlice';
 
 const Post = () => {
+
+     //TODO -- add the delete function with state change
 
 
     /**
@@ -22,18 +24,28 @@ const Post = () => {
 
     const [cover, setCover] = useState("");
     const {id} = useParams();
+
     const dispatchPostById = useDispatch();
+
+    const dispatchUpdatePost = useDispatch();  
+
+    const dispatchDeletePost = useDispatch();  
     
     //we will need to check if the post is defined at the moment of the component mount
     const post = useSelector(state => state.posts.current);
 
+    //get the global state and console it to see the data change
+    const posts = useSelector(state => state.posts.posts);
+    console.log(posts)
+    
+    
     useEffect(() => {
         //this will call the thunk and will make the fetch and populate of the state
         dispatchPostById(getPost(id));
-    }, [])
+    }, []);
 
 
-    const updatePost = async(e) => {
+    const _updatePost = async(e) => {
         e.preventDefault();
       
         const data = new FormData(e.target);
@@ -52,7 +64,13 @@ const Post = () => {
             cover: cover64
         }
         
-        //TODO -- handle the update of the post here
+
+        //TODO -- Wrap this into the server update function and pass the data
+        // using the await returned value into the dispatch inner function
+        // right now is not updatin on the server, is just updating the values "optimistically"
+        dispatchUpdatePost(updatePost(updatedPost));
+
+       
     }
 
 
@@ -68,6 +86,10 @@ const Post = () => {
             
         })    
     }
+
+    const _deletePost = () => {
+        dispatchUpdatePost(deletePost(id));
+    } 
 
     
     return (
@@ -90,7 +112,7 @@ const Post = () => {
 
 
             <div className='update-form-container'>
-            <form onSubmit={updatePost}>
+            <form onSubmit={_updatePost}>
 
                 <label htmlFor="title">Post title:</label>
                 <input type="text" name="title" id="title" defaultValue={post.name} required  />
@@ -106,6 +128,7 @@ const Post = () => {
                 <input type="submit" value="update post" />
            </form>
             </div>
+            <button onClick={_deletePost}>Delete this post</button>
             </div>
             }
         </Fragment>

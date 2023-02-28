@@ -25,15 +25,36 @@ export const postsSlice = createSlice({
             state.posts.push(action.payload);
         },
         getPost: (state, action) => {
-            console.log("TRIGGER")
             const post = state.posts.find( post => post.id === action.payload);
             state.current = post;
         },
+        updatePost: (state, action) => {
+            console.log(action.payload)
+            //set the current so we update the view right away
+            state.current = action.payload;
+
+            //look for the post on the state
+            const post = state.posts.find(post => post.id == action.payload.id);
+            
+            //update the values on the array for the selected post
+            if(post){
+                post.cover = action.payload.cover;
+                post.name = action.payload.name;
+                post.content = action.payload.content;
+            }
+
+        },
         deletePost: (state, action) => {
             const post = state.posts.find( post => post.id === action.payload);
+            
+            //remove the post from the list of posts on the state
             if(post) {
              state.posts.splice(state.posts.indexOf(post), 1);
             }
+
+            //set the current state for the post to null or empty
+            state.current = "";
+
         },
     },
     extraReducers: (builder) => {
@@ -46,5 +67,5 @@ export const postsSlice = createSlice({
 });
 
 
-export const { addPost, getPost, deletePost  } = postsSlice.actions;
+export const { addPost, getPost, updatePost, deletePost  } = postsSlice.actions;
 export default postsSlice.reducer;
